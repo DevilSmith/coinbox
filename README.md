@@ -27,6 +27,8 @@ cd coinbox-client
 ```bash
 dotnet run
 ```
+> In this mode, the application captures the I/O stream of the shell. 
+
 3. Take coins from coinbox:
 ```bash
 dotnet run take-coins [NUMBER] 
