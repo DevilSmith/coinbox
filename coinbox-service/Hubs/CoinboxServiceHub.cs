@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
- 
+
 namespace SignalRApp
 {
     public class CoinboxServiceHub : Hub
@@ -8,7 +8,7 @@ namespace SignalRApp
 
         public CoinboxServiceHub(IHubContext<CoinboxServiceHub> context)
         {
-        _context = context;
+            _context = context;
         }
         public async Task BroadcastSend(string message, string userName)
         {

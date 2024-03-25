@@ -11,12 +11,12 @@ public enum CoinsRepositoryErrors
 
 public class CoinsRepositoryException : Exception
 {
-    public CoinsRepositoryErrors Error {get;}
-     public CoinsRepositoryException(string message, CoinsRepositoryErrors error)
-        : base(message) 
-        {
-            Error = error;
-        }
+    public CoinsRepositoryErrors Error { get; }
+    public CoinsRepositoryException(string message, CoinsRepositoryErrors error)
+       : base(message)
+    {
+        Error = error;
+    }
 }
 
 public class SqliteCoinsRepository : ICoinsRepository
@@ -37,7 +37,7 @@ public class SqliteCoinsRepository : ICoinsRepository
     public async Task<uint> GetCurrentNumberOfCoinsAsync()
     {
         var latestRecord = await db.NumberOfCoins.AsNoTracking().OrderByDescending(r => r.CurrentDateTime).FirstOrDefaultAsync();
-        if(latestRecord is null) return 0;
+        if (latestRecord is null) return 0;
         else return latestRecord.Count;
     }
 
@@ -52,7 +52,7 @@ public class SqliteCoinsRepository : ICoinsRepository
         var currentNumberOfCoins = await GetCurrentNumberOfCoinsAsync();
 
         var currentDateTime = DateTime.Now;
-        
+
         var increasedNumberOfCoins = new NumberOfCoins()
         {
             Count = currentNumberOfCoins + countOfCoins,
@@ -63,7 +63,7 @@ public class SqliteCoinsRepository : ICoinsRepository
             Count = countOfCoins,
             CurrentDateTime = currentDateTime
         };
-        
+
         await db.ChangesToCoins.AddAsync(newChangeToCoins);
         await db.NumberOfCoins.AddAsync(increasedNumberOfCoins);
         await db.SaveChangesAsync();
@@ -76,7 +76,7 @@ public class SqliteCoinsRepository : ICoinsRepository
         var currentDateTime = DateTime.Now;
 
         try
-        { 
+        {
             var decreasedNumberOfCoins = new NumberOfCoins()
             {
                 Count = checked(currentNumberOfCoins - countOfCoinsTaken),
@@ -91,8 +91,9 @@ public class SqliteCoinsRepository : ICoinsRepository
             await db.ChangesToCoins.AddAsync(newChangeToCoins);
             await db.NumberOfCoins.AddAsync(decreasedNumberOfCoins);
             await db.SaveChangesAsync();
-            
-        } catch (OverflowException)
+
+        }
+        catch (OverflowException)
         {
             throw new CoinsRepositoryException("Out of coins count bounds. Revert taking of coins", CoinsRepositoryErrors.OutOfCoinsNumberBounds);
         }

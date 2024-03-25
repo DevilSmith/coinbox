@@ -5,7 +5,7 @@ using SignalRApp;
 namespace coinbox_service.Web.Services;
 
 
-public class CoinsAccumulatorService: IHostedService
+public class CoinsAccumulatorService : IHostedService
 {
 
     private readonly Random _randomizer = new Random();
@@ -24,33 +24,53 @@ public class CoinsAccumulatorService: IHostedService
         _hub = hub;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken) 
-    {  
-        while(!cancellationToken.IsCancellationRequested) {
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
 
-            await Task.Delay(_randomizer.Next(1000,10000));
-            
-            uint coinIncreasing = (uint)_randomizer.Next(1,50);
+                await Task.Delay(_randomizer.Next(1000, 10000));
 
-            await _coinsRepository.PutCoinsAsync(coinIncreasing);
-                       
-            var countOfCoins = await _coinsRepository.GetCurrentNumberOfCoinsAsync();
-            
-            string message = $"Increase coins: {coinIncreasing}. Total: {countOfCoins}";
+                uint coinIncreasing = (uint)_randomizer.Next(10, 50);
 
-            _logger.LogInformation(message);
+                var countOfCoins = await _coinsRepository.GetCurrentNumberOfCoinsAsync();
 
-            await _hub.BroadcastSend("Automatic Service Increasing", message);
+                checked
+                {
+                    var checkOverflow = countOfCoins + coinIncreasing;
+                }
 
-         }
+                await _coinsRepository.PutCoinsAsync(coinIncreasing);
+
+                countOfCoins = await _coinsRepository.GetCurrentNumberOfCoinsAsync();
+
+                string message = $"Increase coins: {coinIncreasing}. Total: {countOfCoins}";
+
+                _logger.LogInformation(message);
+
+                await _hub.BroadcastSend("Automatic Service Increasing", message);
+
+            }
+            catch (OverflowException)
+            {
+                await this.StopAsync(cancellationToken);
+
+                string message = "Overflow coins count. Coin accumulation stops.";
+                await _hub.BroadcastSend("Automatic Service Increasing", message);
+                _logger.LogCritical(message);
+            }
+
+        }
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken) 
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
     }
 
 
 
-    
+
 }
