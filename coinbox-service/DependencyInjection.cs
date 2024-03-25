@@ -11,7 +11,7 @@ public static class DependencyInjection
         services
             .AddSingleton<CoinboxServiceHub>()
             .AddTransient<ILogger, Logger<Program>>()
-            .AddTransient<ICoinsRepository, SqliteCoinsRepository>()
+            .AddSingleton<ICoinsRepository, SqliteCoinsRepository>()
             .AddHostedService<CoinsAccumulatorService>();
 
         return services;
