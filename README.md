@@ -25,7 +25,7 @@ cd coinbox-client
 ```
 2. Starting in message listening mode:
 ```bash
-dotnet run
+dotnet run listen-messages
 ```
 > In this mode, the application captures the I/O stream of the shell. 
 
