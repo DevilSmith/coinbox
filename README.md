@@ -31,11 +31,11 @@ dotnet run listen-messages
 
 3. Take coins from coinbox:
 ```bash
-dotnet run take-coins [NUMBER] 
+dotnet run take-coins <count> 
 ```
 4. Get the history of the change in the number of coins:
 ```bash
-dotnet run get-changes [NUMBER] 
+dotnet run get-changes <count>
 ```
 5. Get the current number of coins:
 ```bash
